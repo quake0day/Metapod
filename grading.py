@@ -2,13 +2,20 @@ import zipfile
 import subprocess
 import csv
 from optparse import OptionParser
+import re
 
-FILENAME = "./Homework3 Download Apr 10, 2018 956 AM.zip"
-CSV_FILE_NAME = "./2018 Spring-CSC141-03 Computer Sci I_GradesExport_2018-04-10-09-41.csv"
-GRADE_ITEM = "Homework3 Points Grade <Numeric MaxPoints:6 Category:Homework>"
+FILENAME = "./Quiz1 Download Apr 10, 2018 1019 AM.zip"
+CSV_FILE_NAME = "./2018 Spring-CSC141-03 Computer Sci I_GradesExport_2018-04-10-10-26.csv"
+GRADE_ITEM = "Quiz1 Points Grade <Numeric MaxPoints:5 Category:Quiz>"
 TMP_FILE = "./pos.tmp"
 GRADING_POLICY = '0'
 #MAXPOINTS = str(6)
+
+def readTotalPoint(GRADE_ITEM):
+    m = re.search('(?<=MaxPoints:)\w+', GRADE_ITEM)
+    totalPoint = m.group(0)
+    return totalPoint
+
 # save last status .. just in case
 def saveLastPosition(tmp_file, num):
     f = open(tmp_file, 'w')
@@ -61,8 +68,8 @@ def readZipFile(filename):
                         print e
                         pass
                     print '--------------RUNNING RESULT END--------'
-
-                    grade = raw_input('Grade it (?/6) + Bonues 1: ')
+                    totalPoint = readTotalPoint(GRADE_ITEM)
+                    grade = raw_input('Grade it (?/'+ totalPoint + ')')
                     enterGrade(CSV_FILE_NAME, GRADE_ITEM, name, grade)
                     saveLastPosition(TMP_FILE,i)
         #source_file = archive.read('')
@@ -112,8 +119,6 @@ def checkGrade(csv_file_name, grade_item, name):
     last_name_col_num = lines[0].index('Last Name')
     first_name_col_num = lines[0].index('First Name')
     for row in lines:
-        print row[last_name_col_num], lastname
-        print row[first_name_col_num], firstname
         if row[last_name_col_num] == lastname and row[first_name_col_num] == firstname:
             if row[col_num] == '':
                 print "TRUE"
@@ -145,6 +150,7 @@ if __name__ == '__main__':
     parser.add_option("-g", help="grading policy. 0 for regrade all students, 1 for grade new students", dest="num", default=0)
     options, args = parser.parse_args()
     GRADING_POLICY = options.num
+    print readTotalPoint(GRADE_ITEM)
     #checkGrade(CSV_FILE_NAME, GRADE_ITEM, ['ELIZABETH','LEGG'])
     readZipFile(FILENAME)
 #enterGrade(CSV_FILE_NAME, GRADE_ITEM, ['LEGG', 'ELIZABETH'] , 6)
