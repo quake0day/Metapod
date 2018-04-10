@@ -3,9 +3,9 @@ import subprocess
 import csv
 from optparse import OptionParser
 
-FILENAME = "./Homework2 Download Mar 2, 2017 1248 PM.zip"
-CSV_FILE_NAME = "./2017 Spring-CSC141-03 Computer Sci I_GradesExport_2017-03-02-12-50.csv"
-GRADE_ITEM = "Homework 2 Points Grade <Numeric MaxPoints:6 Category:Homework>"
+FILENAME = "./Homework3 Download Apr 10, 2018 956 AM.zip"
+CSV_FILE_NAME = "./2018 Spring-CSC141-03 Computer Sci I_GradesExport_2018-04-10-09-41.csv"
+GRADE_ITEM = "Homework3 Points Grade <Numeric MaxPoints:6 Category:Homework>"
 TMP_FILE = "./pos.tmp"
 GRADING_POLICY = '0'
 #MAXPOINTS = str(6)
@@ -36,7 +36,8 @@ def readZipFile(filename):
                 # split the filename
                 # sample filename
                 # 522062-838799 - Emily McDevitt - Sep 10, 2016 552 PM - Homework_one_EM.java
-                unused, unused1, name, date, filename = sf.split('-')
+                #print sf.split(' - ')
+                unused, name, date, filename = sf.split(' - ')
                 filename = filename.strip()
                 name = name.strip()
                 name = name.split(' ')
@@ -55,10 +56,10 @@ def readZipFile(filename):
                     output = None
                     try:
                         output = runJava(filename, source_code)
+                        print output
                     except Exception, e:
                         print e
                         pass
-                    print output
                     print '--------------RUNNING RESULT END--------'
 
                     grade = raw_input('Grade it (?/6) + Bonues 1: ')
@@ -87,17 +88,32 @@ def runJava(filename, source_code):
     output = subprocess.check_output(['java', class_file_name])
     return output
 
+def getName(name):
+    firstname, lastname = "", ""
+    if len(name) == 2:
+        firstname, lastname = name[0], name[1]
+    else:
+        lastname = name[-1]
+        firstname = " ".join(fn for fn in name[:-1])  
+    return firstname, lastname
 
 def checkGrade(csv_file_name, grade_item, name):
-    print "Checking...." + name[0] + name[1]
+    # if len(name) == 2:
+    #     firstname, lastname = name[0], name[1]
+    # else:
+    #     lastname = name[-1]
+    #     firstname = " ".join(fn for fn in name[:-1])  
+    firstname, lastname = getName(name)
+    print "Student Name: " + firstname +" "+ lastname
 
-    firstname, lastname = name[0], name[1]
     r = csv.reader(open(csv_file_name))
     lines = [l for l in r]
     col_num = lines[0].index(grade_item)
     last_name_col_num = lines[0].index('Last Name')
     first_name_col_num = lines[0].index('First Name')
     for row in lines:
+        print row[last_name_col_num], lastname
+        print row[first_name_col_num], firstname
         if row[last_name_col_num] == lastname and row[first_name_col_num] == firstname:
             if row[col_num] == '':
                 print "TRUE"
@@ -109,7 +125,7 @@ def checkGrade(csv_file_name, grade_item, name):
 
 
 def enterGrade(csv_file_name, grade_item, name, grade):
-    firstname, lastname = name[0], name[1]
+    firstname, lastname = getName(name)
     r = csv.reader(open(csv_file_name))
     lines = [l for l in r]
     col_num = lines[0].index(grade_item)
